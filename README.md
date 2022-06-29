@@ -1,6 +1,6 @@
 ## Vehicle-Damage-Control-Application
 
-## You can find the models file [here](https://drive.google.com/file/d/1spSrDsfwHFz6VMcgtPJbt-NqeW3OG_gI/view?usp=sharing) 
+## To get the models file [Click here](https://drive.google.com/file/d/1spSrDsfwHFz6VMcgtPJbt-NqeW3OG_gI/view?usp=sharing) 
 
 **Result**
 
