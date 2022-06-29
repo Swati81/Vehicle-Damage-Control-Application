@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Page</title>
+</head>
+<nav class = "navbar navbar-dark bg-dark" >
+  <a class="navbar-dark"  href="/">HOME</a>
+</nav>
+
+<center><h1><legend style="color:white;top:80px;font-family:cursive; font-size:30pt">
+           Vehicle Damage Recognition</legend></h1></center>
+        <div style="position:fixed; top:150px; left:620px">
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        body{background-color: #19193d;}
+        .iupload h3{color: #dde0ed;font-size:30px;font-weight: 700;}
+        .img-part{height:500px;width:500px;margin:0px auto;}
+        .image-part{height:330px;width:500px;border:1px solid #dde0ed;}
+        .image-part img{position:absolute;height: 330px;width:500px;display:none;padding:5px;}
+        .image-part #video{display:block;height: 330px;width:500px;padding:5px;}
+        .res-part{border:1px solid #dde0ed;margin-left:20px;height: 310px;width:100%;padding:5px;margin:0px auto;overflow:auto;}
+        .res-part2{border:1px solid #dde0ed;height: 310px;width:100%;padding:5px;margin:0px auto;}
+        .resp-img{height: 298px;width: 233px;margin:0px auto;}
+        .jsonRes{margin-left:30px;}
+        #send{cursor:pointer;}
+        .btn-part{width:325px;}
+        textarea,
+        select,
+        .form-control,
+        .custom-select,
+        button.btn,
+        .btn-primary,
+        input[type="url"],
+        .uneditable-input{
+            border: 1px solid #e6e8f2;
+            outline: 0 !important;
+            border-radius:0px;
+            box-shadow: none;
+           -webkit-box-shadow: none;
+           -moz-box-shadow: none;
+           -moz-transition: none;
+           -webkit-transition: none;
+        }
+        textarea:focus,
+        select:focus,
+        .form-control:focus,
+        .btn:focus,
+        .btn-primary:focus,
+        .custom-select:focus,
+        input[type="text"]:focus,
+        .uneditable-input:focus{
+            border: 1px solid #007bff;
+            outline: 0 !important;
+            border-radius:0px;
+            box-shadow: none;
+           -webkit-box-shadow: none;
+           -moz-box-shadow: none;
+           -moz-transition: none;
+           -webkit-transition: none;
+        }
+        
+    
+        </style>
+
+
+</head>
+<body>
+<div style="color:black;position:fixed; top:100px; left:1100px; width:auto; height:auto;">
+<a href="{{url_for('download_file')}}">DOWNLOAD-RECORD</a>
+</div>
+
+    <div class="main container">
+        <section class="iupload">
+            
+            <div class="row">
+                <div class="img-part col-md-6">
+                    <div class="image-part">
+            <video autoplay id="video" poster="https://www2.deloitte.com/content/dam/Deloitte/lu/Images/promo_images/lu-car-damage-1x1.jpg"></video>
+                        <img src="F:\UPWORK\UPWORK.jpg" id="photo">
+                        <canvas style="display:none;" id="canvas"></canvas>
+                    </div>
+                    <div class="btn-part">
+                        <form id="upload-data pt-3" class="">
+                            <div class="input-group mt-3 row">
+                                <button type="button" class="btn btn-dark col-md-5 col-xs-5 ml-3 mr-4" id="uload">Upload</button>
+                                <button id="send" type="button" class="btn btn-primary col-md-5 col-xs-5">Predict</button>
+                            </div>
+
+
+                            <input type="hidden" class="form-control mr-2" id="url" placeholder="Enter REST Api url..." value="../result"/>
+                            <input name="upload" type="file" id="fileinput" style="position:absolute;top:-500px;"/><br/>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+        </div>
+
+
+<div id="loading"><div class="loader"></div></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<script>
+var mybtn = document.getElementById('startbtn');
+var myvideo = document.getElementById('video');
+var mycanvas = document.getElementById('canvas');
+var myphoto = document.getElementById('photo');
+var base_data = "";
+
+function sendRequest(base64Data){
+  var type = "json";
+  if(base64Data != "" || base64Data != null){
+    if(type == "imgtobase"){
+      $(".res-part").html("");
+      $(".res-part").html(base64Data);
+    }
+    else if(type == "basetoimg"){
+      var imageData = $("#imgstring").val();
+      $(".res-part").html("");
+      $(".res-part").append("<img src='data:image/jpeg;base64," + imageData + "' alt='' />");
+    }
+    else{
+      var url = $("#url").val();
+      $("#loading").show();
+      $.ajax({
+        url : url,
+        type: "post",
+        cache: false,
+        async: true,
+        crossDomain: true,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin':'*'
+        },
+        data:JSON.stringify({image:base64Data}),
+        success: function(res){
+          $(".res-part").html("");
+          $(".res-part2").html("");
+          try{
+            var imageData = res[1].image;
+            if(imageData.length > 100){
+              if(imageData.length > 10){$(".res-part2").append("<img class='resp-img' src='data:image/jpeg;base64," + imageData + "' alt='' />");}
+            }
+          }catch(e){}
+          $(".res-part").html("<pre>" + JSON.stringify(res[0], undefined, 2) + "</pre>");
+          $("#loading").hide();
+        }
+      });
+    }
+  }
+}
+
+$(document).ready(function(){
+  $("#loading").hide();
+
+  $('#send').click(function(evt){
+    sendRequest(base_data);
+    });
+
+    $('#uload').click(function(evt) {
+        $('#fileinput').focus().trigger('click');
+    });
+  $("#fileinput").change(function(){
+    if (this.files && this.files[0]){
+      var reader = new FileReader();
+      reader.onload = function (e){
+        var url = e.target.result;
+        var img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = function(){
+          var canvas = document.createElement('CANVAS');
+          var ctx = canvas.getContext('2d');
+          canvas.height = this.height;
+          canvas.width = this.width;
+          ctx.drawImage(this, 0, 0);
+          base_data = canvas.toDataURL('image/jpeg', 1.0).replace(/^data:image.+;base64,/, '');
+          canvas = null;
+        };
+        img.src = url;
+        $('#photo').attr('src', url);
+        $('#photo').show();
+        $('#video').hide();
+      }
+      reader.readAsDataURL(this.files[0]);
+    }
+  });
+});
+
+</script>
+<div>
+  <!--#a11587-->
+  <legend style="color:#a11587 ;top:100px;left:60px;font-family:Georgia, serif; font-size:30pt">
+           Instructions</legend>
+           <legend style="color:#7e7ea3;top:170px;left:40px;font-family:Georgia, serif; font-size:15pt">
+          This Car Damage assessment tool enables you to submit a photo of your vehicle's</legend>
+          <legend style="color:#7e7ea3;top:190px;left:40px;font-family:Georgia, serif; font-size:15pt">
+            damage in order to accurately determine the position and degree of the damage,</legend>
+          <legend style="color:#7e7ea3;top:210px;left:40px;font-family:Georgia, serif; font-size:15pt">
+           </legend>
+          <legend style="color:#7e7ea3;top:230px;left:44px;font-family:Georgia, serif; font-size:15pt">
+          alleviating the stress of filing an insurance claim and having your vehicle repaired.</legend>
+          <legend style="color:#7e7ea3;top:230px;left:48px;font-family:Georgia, serif; font-size:18pt">
+          1. To begin, take a photograph of the damage to your vehicle. To  </legend>
+         <legend style="color:#7e7ea3;top:290px;left:44px;font-family:Georgia, serif; font-size:18pt">
+          achieve the best results, concentrate on a single significant region    </legend>
+           <legend style="color:#7e7ea3;top:310px;left:50px;font-family:Georgia, serif; font-size:18pt">
+          of damage (e.g., front, side,or rear) and include the majority of the   </legend>
+           <legend style="color:#7e7ea3;top:330px;left:50px;font-family:Georgia, serif; font-size:18pt">
+          car's body panels in the photograph.  </legend>
+           <legend style="color:#7e7ea3;top:350px;left:50px;font-family:Georgia, serif; font-size:18pt">
+           2. Using our convenient online web app and image upload features,</legend>
+           <legend style="color:#7e7ea3;top:370px;left:50px;font-family:Georgia, serif; font-size:18pt">
+            send your photo to the Car Damage assessor.</legend>
+           <legend style="color:#7e7ea3;top:390px;left:50px;font-family:Georgia, serif; font-size:18pt">
+           3. Convolutional neural networks constructed using Google Colab   </legend>
+           <legend style="color:#7e7ea3;top:410px;left:50px;font-family:Georgia, serif; font-size:18pt">
+           image recognition algorithms will detect the location and severity  </legend>
+           <legend style="color:#7e7ea3;top:430px;left:50px;font-family:Georgia, serif; font-size:18pt">
+           of your car's damage and offer an instant evaluation of your loss. </legend>
+           <legend style="color:#7e7ea3;top:450px;left:50px;font-family:Georgia, serif; font-size:18pt">
+          4.  The results can be utilised to acquire a cost estimate or to accelerate </legend>
+          <legend style="color:#7e7ea3;top:450px;left:50px;font-family:Georgia, serif; font-size:18pt">
+          claims processing with your insurance company.</legend>
+       </div>
+
+</body>
+</html>
